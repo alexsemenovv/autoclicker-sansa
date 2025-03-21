@@ -1,5 +1,6 @@
 import time
 import threading
+
 import requests
 import pyautogui
 import os
@@ -10,6 +11,7 @@ from PIL import ImageChops, ImageStat, Image
 import io
 import logging
 from google.cloud import vision
+from config import BOT_TOKEN
 
 global chosen_candidate
 
@@ -18,7 +20,7 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "app/vovkaproject-1c326021c3bf.js
 logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(message)s')
 
 # ---------------------- Настройки Telegram-бота ----------------------
-TELEGRAM_BOT_TOKEN = ""
+TELEGRAM_BOT_TOKEN = BOT_TOKEN
 BASE_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 SUBSCRIBERS_FILE = "subscribers.txt"
 subscribers = set()
@@ -28,6 +30,7 @@ DEBUG_SCREENSHOT = False
 
 # Инициализируем клиента Google Cloud Vision
 vision_client = vision.ImageAnnotatorClient()
+
 
 def extract_text_google_vision(pil_image):
     """
@@ -54,6 +57,7 @@ def extract_text_google_vision(pil_image):
         results.append([vertices, annotation.description, confidence])
     return full_text, results
 
+
 def load_subscribers():
     global subscribers
     if os.path.exists(SUBSCRIBERS_FILE):
@@ -64,10 +68,12 @@ def load_subscribers():
                     subscribers.add(line)
         print(f"[INFO] Загружено подписчиков: {subscribers}")
 
+
 def save_subscribers():
     with open(SUBSCRIBERS_FILE, "w") as f:
         for sub in subscribers:
             f.write(f"{sub}\n")
+
 
 def send_message(chat_id, message):
     url = f"{BASE_URL}/sendMessage"
@@ -76,6 +82,7 @@ def send_message(chat_id, message):
         requests.post(url, data=payload)
     except Exception as e:
         print("Ошибка при отправке сообщения:", e)
+
 
 def send_photo(chat_id, photo_path, caption=""):
     """Отправляет фото через Telegram"""
@@ -88,10 +95,12 @@ def send_photo(chat_id, photo_path, caption=""):
     except Exception as e:
         print("Ошибка при отправке фото:", e)
 
+
 def telegram_log(message):
     """Отправляет сообщение всем подписчикам (используем для логов по распознаванию и т.п.)"""
     for chat_id in subscribers:
         send_message(chat_id, message)
+
 
 def poll_updates():
     # При запуске бота получаем накопленные апдейты и вычисляем offset,
@@ -159,6 +168,7 @@ def poll_updates():
             print("Ошибка при получении обновлений:", e)
         time.sleep(1)
 
+
 def open_browser_and_navigate():
     """
     Открываем sansabet.com (или другой нужный сайт) через адресную строку.
@@ -167,6 +177,7 @@ def open_browser_and_navigate():
     time.sleep(1)
     pyautogui.write("https://sansabet.com", interval=0.1)
     pyautogui.press("enter")
+
 
 def wait_for_site_ready_color(target_color, color_tolerance=10, check_region=(604, 119, 5, 5)):
     """
@@ -178,7 +189,7 @@ def wait_for_site_ready_color(target_color, color_tolerance=10, check_region=(60
         stat = ImageStat.Stat(screenshot_candidate)
         avg_color = tuple(int(c) for c in stat.mean)
         telegram_log(f"[DEBUG] Checking site color at {check_region}: {avg_color}")
-        
+
         # Проверяем, что средний цвет близок к ожидаемому
         if all(abs(avg_color[i] - target_color[i]) <= color_tolerance for i in range(3)):
             telegram_log("[INFO] Site color matched, proceeding to login.")
@@ -186,6 +197,7 @@ def wait_for_site_ready_color(target_color, color_tolerance=10, check_region=(60
         else:
             telegram_log("[INFO] Site color not matched, waiting 10 seconds before retry.")
             time.sleep(10)
+
 
 def check_for_text(expected_text, top_left, bottom_right, timeout=15):
     """
@@ -215,6 +227,7 @@ def check_for_text(expected_text, top_left, bottom_right, timeout=15):
         time.sleep(1)
     return False
 
+
 def do_login():
     """
     Примерный сценарий логина (на реальном проекте заменить координаты/логику).
@@ -233,6 +246,7 @@ def do_login():
     pyautogui.click(551, 338, clicks=1)
     time.sleep(2)
 
+
 def find_match(match_name):
     """
     Переходит в лайв и вводит название матча match_name в поиске.
@@ -243,14 +257,15 @@ def find_match(match_name):
 
     pyautogui.click(live_coords[0], live_coords[1])
     time.sleep(2.5)
-    
+
     pyautogui.click(match_input_coords[0], match_input_coords[1])
     time.sleep(0.5)
     pyautogui.write(match_name, interval=0.05)
     time.sleep(1)
-    
+
     pyautogui.click(match_click_coords[0], match_click_coords[1])
     time.sleep(2)
+
 
 def optimized_search_for_outcome(outcome, outcome_search_region, max_scroll_iterations=10, difference_threshold=30):
     """
@@ -283,10 +298,10 @@ def optimized_search_for_outcome(outcome, outcome_search_region, max_scroll_iter
 
         # Отправка отладочного скриншота
         if DEBUG_SCREENSHOT:
-            debug_outcome_path = f"debug_outcome_screenshot_{iteration+1}.png"
+            debug_outcome_path = f"debug_outcome_screenshot_{iteration + 1}.png"
             current_screenshot.save(debug_outcome_path)
             for chat_id in subscribers:
-                send_photo(chat_id, debug_outcome_path, caption=f"Тестовый скриншот, итерация {iteration+1}")
+                send_photo(chat_id, debug_outcome_path, caption=f"Тестовый скриншот, итерация {iteration + 1}")
 
         # Проверяем, нет ли изменений в области (чтобы понять, дошли ли до низа)
         if previous_screenshot is not None:
@@ -299,7 +314,7 @@ def optimized_search_for_outcome(outcome, outcome_search_region, max_scroll_iter
 
         # Распознаём текст на текущем скриншоте
         full_text, results = extract_text_google_vision(current_screenshot)
-        #telegram_log(f"[DEBUG] Итерация {iteration+1}\nПолный текст:\n{full_text.strip()}")
+        # telegram_log(f"[DEBUG] Итерация {iteration+1}\nПолный текст:\n{full_text.strip()}")
 
         n = len(results)
         # Перебираем OCR-блоки для поиска последовательного совпадения с ожидаемым исходом
@@ -329,10 +344,11 @@ def optimized_search_for_outcome(outcome, outcome_search_region, max_scroll_iter
                             results[k][1].strip() for k in range(i, j + 1)
                         ]
                         matched_text = " ".join(original_text_fragments)
-                        telegram_log(f"[DEBUG] Найден исход путём объединения блоков {i}-{j}: '{current_combined}'. Координаты: {coords}")
+                        telegram_log(
+                            f"[DEBUG] Найден исход путём объединения блоков {i}-{j}: '{current_combined}'. Координаты: {coords}")
                         return coords, matched_text
                 else:
-                    #telegram_log(f"[DEBUG] Объединение '{current_combined + ' ' + next_block}' не соответствует '{expected}'. Прерываем объединение.")
+                    # telegram_log(f"[DEBUG] Объединение '{current_combined + ' ' + next_block}' не соответствует '{expected}'. Прерываем объединение.")
                     break
 
         previous_screenshot = current_screenshot
@@ -341,6 +357,7 @@ def optimized_search_for_outcome(outcome, outcome_search_region, max_scroll_iter
 
     telegram_log("[ERROR] Не удалось найти исход после прокрутки.")
     return None, None
+
 
 # ======================= Координаты и константы для ставок =======================
 
@@ -359,6 +376,7 @@ COEFFICIENT_SCREENSHOT_PADDING_BOTTOM = 80
 
 # Доп. регион для первичной проверки (теперь НЕ используем скриншоты)
 FIRST_CLICK_COEF_REGION = (1000, 400, 300, 100)  # остаётся для примера, но не применяем
+
 
 def check_coefficient_condition(found_coef, condition_str):
     """
@@ -392,33 +410,34 @@ def check_coefficient_condition(found_coef, condition_str):
                 valid = False
     return valid
 
+
 def extract_coefficient_from_region(region):
     """
     Делаем скриншот заданной области, обрезаем её и через OCR вытаскиваем число.
     Используется для финальной проверки (после ввода суммы).
     """
     screenshot = pyautogui.screenshot(region=region)
-    
+
     # Обрезаем правую половину и нижние 2/3
     if chosen_candidate in BET_INPUT_CANDIDATES_SET1:
         width, height = screenshot.size
         left = int(width / 2)
-        upper = int(height * 1/3)
+        upper = int(height * 1 / 3)
         cropped_screenshot = screenshot.crop((left, upper, width, height))
     else:
         cropped_screenshot = screenshot
-    #Отладочный скрин
+    # Отладочный скрин
     debug_coef_path = "debug_coef_screenshot.png"
     cropped_screenshot.save(debug_coef_path)
     for chat_id in subscribers:
         send_photo(chat_id, debug_coef_path, caption="Скрин коэффициента (обрезанный)")
-    
+
     time.sleep(1)
-    
+
     # Получаем OCR-текст и ищем число
     full_text, _ = extract_text_google_vision(cropped_screenshot)
     telegram_log(f"[DEBUG] OCR текст коэффициента: {full_text}")
-    
+
     matches = re.findall(r"\b\d+(?:\.\d+)?\b", full_text)
     if matches:
         coef_str = matches[0].replace(",", ".")
@@ -430,6 +449,7 @@ def extract_coefficient_from_region(region):
             return None
     else:
         return None
+
 
 def parse_coefficient_from_text(text):
     """
@@ -446,6 +466,7 @@ def parse_coefficient_from_text(text):
             return None
     return None
 
+
 def find_bet_input_coords():
     """
     Ищем координаты для ввода суммы среди двух наборов:
@@ -455,6 +476,7 @@ def find_bet_input_coords():
 
     Возвращает кортеж (x, y) или None, если ничего не нашли.
     """
+
     def check_candidates_set(candidates):
         tries = 0
         for candidate in candidates:
@@ -481,7 +503,7 @@ def find_bet_input_coords():
     else:
         telegram_log("Пытаюсь крутить!")
         # Скроллим чуть вниз
-        pyautogui.click(1181,573)
+        pyautogui.click(1181, 573)
         time.sleep(0.5)
         pyautogui.scroll(-2)
         found = (1218, 590)
@@ -493,7 +515,7 @@ def find_outcome(outcome, coef_condition, bet_amount):
     global chosen_candidate
     """
     Функция для нахождения исхода матча и размещения ставки с проверкой коэффициента.
-    
+
     Алгоритм (обновлённый):
       1. Если исход ("1", "X", "2") - кликаем по заранее заданным координатам.
       2. Иначе ищем текст исхода через optimized_search_for_outcome.
@@ -556,7 +578,6 @@ def find_outcome(outcome, coef_condition, bet_amount):
     time.sleep(2)
     pyautogui.scroll(300)
 
-
     # 7. Финальная проверка кэфа (со скриншотом)
     if chosen_candidate in BET_INPUT_CANDIDATES_SET1:
         coef_region_x = chosen_candidate[0] - COEFFICIENT_SCREENSHOT_PADDING_X
@@ -571,7 +592,7 @@ def find_outcome(outcome, coef_condition, bet_amount):
     screenshot_coef.save(debug_coef_path)
     # for chat_id in subscribers:
     #     send_photo(chat_id, debug_coef_path, caption="Скрин коэффициента из новой области")
-    
+
     time.sleep(1)
     found_coef = extract_coefficient_from_region((coef_region_x, coef_region_y, coef_region_width, coef_region_height))
     if found_coef is not None:
@@ -622,7 +643,7 @@ def find_outcome(outcome, coef_condition, bet_amount):
             time.sleep(0.5)
             pyautogui.click(1118, 473)
             pyautogui.scroll(-300)
-            pyautogui.click(997, 601) # удаляем ставку из корзины
+            pyautogui.click(997, 601)  # удаляем ставку из корзины
             time.sleep(0.5)
             pyautogui.click(619, 524)
             time.sleep(0.6)
@@ -644,9 +665,10 @@ def find_outcome(outcome, coef_condition, bet_amount):
 
     return True
 
+
 def main():
     """
-    Точка входа: 
+    Точка входа:
       - Загружаем подписчиков,
       - Стартуем поток для приёма Telegram-сообщений,
       - Шлём приветственное сообщение,
@@ -656,7 +678,7 @@ def main():
       - Дальше идёт бесконечное ожидание, пока poll_updates обрабатывает ставки.
     """
     load_subscribers()
-    
+
     updater = threading.Thread(target=poll_updates, daemon=True)
     updater.start()
 
@@ -677,6 +699,7 @@ def main():
     # Просто ждём, пока в другом потоке poll_updates обрабатывает сообщения
     while True:
         time.sleep(1)
+
 
 if __name__ == "__main__":
     main()
