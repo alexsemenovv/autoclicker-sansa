@@ -16,7 +16,7 @@ from config import BOT_TOKEN
 global chosen_candidate
 
 # Настройка переменных окружения и логирования для Google Cloud Vision API
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "app/vovkaproject-1c326021c3bf.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "sansabet-60de415fbcfc.json"
 logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] %(message)s')
 
 # ---------------------- Настройки Telegram-бота ----------------------
