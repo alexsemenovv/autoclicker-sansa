@@ -43,7 +43,8 @@ RUN pip3 install --no-cache-dir \
     pytesseract \
     google-cloud-vision \
     numpy \
-    requests
+    requests \
+    dotenv
 
 # Копируем файлы приложения
 WORKDIR /app
@@ -55,7 +56,7 @@ RUN chmod +x /app/start.sh
 # Настраиваем переменные окружения:
 # DISPLAY для GUI-приложений и GOOGLE_APPLICATION_CREDENTIALS для Google Cloud Vision
 ENV DISPLAY=:99
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/app/vovkaproject-1c326021c3bf.json
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/app/sansabet-60de415fbcfc.json
 
 # Запускаем start.sh при старте контейнера, который, в свою очередь, запускает bot.py
 CMD ["/app/start.sh"]
