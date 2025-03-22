@@ -171,15 +171,15 @@ def poll_updates():
 
 def open_browser_and_navigate():
     """
-    Открываем sansabet.com (или другой нужный сайт) через адресную строку.
+    Открываем olimp.bet (или другой нужный сайт) через адресную строку.
     """
     pyautogui.hotkey('ctrl', 'l')
     time.sleep(1)
-    pyautogui.write("https://sansabet.com", interval=0.1)
+    pyautogui.write("https://www.olimp.bet/", interval=0.1)
     pyautogui.press("enter")
 
 
-def wait_for_site_ready_color(target_color, color_tolerance=10, check_region=(604, 119, 5, 5)):
+def wait_for_site_ready_color(target_color, color_tolerance=10, check_region=(530, 8, 53, 32)):
     """
     Ждёт, пока в зоне check_region (5x5 пикселей) цвет не станет близким к target_color (± color_tolerance).
     Если цвет не совпадает, ждёт 10 секунд и пробует снова.
@@ -230,21 +230,28 @@ def check_for_text(expected_text, top_left, bottom_right, timeout=15):
 
 def do_login():
     """
-    Примерный сценарий логина (на реальном проекте заменить координаты/логику).
+    Логинимся
     """
     print("[INFO] Выполняется логин...")
-    pyautogui.click(784, 133, clicks=2)
-    pyautogui.write("", interval=0.1)
+    telegram_log("[DEBUG] Enter the button 'Вход'")
+    pyautogui.click(530, 8, clicks=1)
     time.sleep(1)
-    pyautogui.click(967, 132, clicks=2)
-    pyautogui.write("", interval=0.1)
+
+    telegram_log("[DEBUG] In the window that appears, click on the 'Phone number' field")
+    pyautogui.click(534, 226, clicks=1)
+    telegram_log("Enter the phone number")
+    pyautogui.write("+79517850219", interval=0.1)
     time.sleep(1)
-    pyautogui.click(1159, 130, clicks=1)
+
+    telegram_log("Click to field 'password'")
+    pyautogui.click(534, 294, clicks=1)
+    telegram_log("Enter password")
+    pyautogui.write("Abc9517850219", interval=0.1)
+
+    telegram_log("Press button enter")
+    pyautogui.press("enter")
     time.sleep(3)
 
-    # Закрываем всплывающее окно
-    pyautogui.click(551, 338, clicks=1)
-    time.sleep(2)
 
 
 def find_match(match_name):
@@ -672,7 +679,7 @@ def main():
       - Загружаем подписчиков,
       - Стартуем поток для приёма Telegram-сообщений,
       - Шлём приветственное сообщение,
-      - Открываем браузер и заходим на sansabet.com,
+      - Открываем браузер и заходим на olimp.bet,
       - Ждём пока цвет в определённой точке не станет правильным,
       - Делаем логин,
       - Дальше идёт бесконечное ожидание, пока poll_updates обрабатывает ставки.
@@ -690,10 +697,11 @@ def main():
     time.sleep(5)
 
     # Ждём пока сайт станет "готовым" по цвету
-    SITE_READY_COLOR = (224, 175, 0)  # Укажите нужный цвет
-    wait_for_site_ready_color(SITE_READY_COLOR, 10, (604, 119, 5, 5))
+    SITE_READY_COLOR = (34, 55, 63, 255)  # Укажите нужный цвет
+    wait_for_site_ready_color(SITE_READY_COLOR, 10, (530, 8, 53, 32))
 
     do_login()
+    print('Выполнен вход')
     time.sleep(5)
 
     # Просто ждём, пока в другом потоке poll_updates обрабатывает сообщения
