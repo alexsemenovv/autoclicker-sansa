@@ -258,19 +258,14 @@ def find_match(match_name):
     """
     Переходит в лайв и вводит название матча match_name в поиске.
     """
-    live_coords = (641, 190)
-    match_input_coords = (1065, 240)
-    match_click_coords = (857, 373)
-
-    pyautogui.click(live_coords[0], live_coords[1])
-    time.sleep(2.5)
+    match_input_coords = (53, 74)
 
     pyautogui.click(match_input_coords[0], match_input_coords[1])
     time.sleep(0.5)
     pyautogui.write(match_name, interval=0.05)
     time.sleep(1)
 
-    pyautogui.click(match_click_coords[0], match_click_coords[1])
+    pyautogui.press("enter")
     time.sleep(2)
 
 
@@ -321,7 +316,7 @@ def optimized_search_for_outcome(outcome, outcome_search_region, max_scroll_iter
 
         # Распознаём текст на текущем скриншоте
         full_text, results = extract_text_google_vision(current_screenshot)
-        # telegram_log(f"[DEBUG] Итерация {iteration+1}\nПолный текст:\n{full_text.strip()}")
+        telegram_log(f"[DEBUG] Итерация {iteration+1}\nПолный текст:\n{full_text.strip()}")
 
         n = len(results)
         # Перебираем OCR-блоки для поиска последовательного совпадения с ожидаемым исходом
@@ -355,7 +350,7 @@ def optimized_search_for_outcome(outcome, outcome_search_region, max_scroll_iter
                             f"[DEBUG] Найден исход путём объединения блоков {i}-{j}: '{current_combined}'. Координаты: {coords}")
                         return coords, matched_text
                 else:
-                    # telegram_log(f"[DEBUG] Объединение '{current_combined + ' ' + next_block}' не соответствует '{expected}'. Прерываем объединение.")
+                    telegram_log(f"[DEBUG] Объединение '{current_combined + ' ' + next_block}' не соответствует '{expected}'. Прерываем объединение.")
                     break
 
         previous_screenshot = current_screenshot
