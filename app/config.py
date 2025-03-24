@@ -7,3 +7,5 @@ else:
     load_dotenv()
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
+PHONE_NUMBER = os.getenv("PHONE_NUMBER")
+PASSWORD = os.getenv("PASSWORD")

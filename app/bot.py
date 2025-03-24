@@ -11,7 +11,7 @@ from PIL import ImageChops, ImageStat, Image
 import io
 import logging
 from google.cloud import vision
-from config import BOT_TOKEN
+from config import BOT_TOKEN, PHONE_NUMBER, PASSWORD
 
 global chosen_candidate
 
@@ -240,13 +240,13 @@ def do_login():
     telegram_log("[DEBUG] In the window that appears, click on the 'Phone number' field")
     pyautogui.click(534, 226, clicks=1)
     telegram_log("Enter the phone number")
-    pyautogui.write("+79517850219", interval=0.1)
+    pyautogui.write(PHONE_NUMBER, interval=0.1)
     time.sleep(1)
 
     telegram_log("Click to field 'password'")
     pyautogui.click(534, 294, clicks=1)
     telegram_log("Enter password")
-    pyautogui.write("Abc9517850219", interval=0.1)
+    pyautogui.write(PASSWORD, interval=0.1)
 
     telegram_log("Press button enter")
     pyautogui.press("enter")
