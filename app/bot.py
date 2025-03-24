@@ -259,13 +259,14 @@ def find_match(match_name):
     Переходит в лайв и вводит название матча match_name в поиске.
     """
     match_input_coords = (53, 74)
+    match_click_coords = (500, 242)
 
     pyautogui.click(match_input_coords[0], match_input_coords[1])
     time.sleep(0.5)
     pyautogui.write(match_name, interval=0.05)
     time.sleep(1)
 
-    pyautogui.press("enter")
+    pyautogui.click(match_click_coords[0], match_click_coords[1])
     time.sleep(2)
 
 
@@ -530,7 +531,7 @@ def find_outcome(outcome, coef_condition, bet_amount):
       7. Если не подходит — скроллим вверх и жмём Retry.
     """
     PREDEFINED_OUTCOME_COORDS = {
-        "1": (243, 573),
+        "1": (761, 242),
         "X": (399, 573),
         "2": (555, 572)
     }
