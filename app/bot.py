@@ -179,7 +179,8 @@ def open_browser_and_navigate():
     pyautogui.press("enter")
 
 
-def wait_for_site_ready_color(target_color, color_tolerance=10, check_region=(530, 8, 53, 32)):
+
+def wait_for_site_ready_color(target_color, color_tolerance=10, check_region=(0, 100, 5, 5)):
     """
     Ждёт, пока в зоне check_region (5x5 пикселей) цвет не станет близким к target_color (± color_tolerance).
     Если цвет не совпадает, ждёт 10 секунд и пробует снова.
@@ -694,8 +695,8 @@ def main():
     time.sleep(5)
 
     # Ждём пока сайт станет "готовым" по цвету
-    SITE_READY_COLOR = (34, 55, 63, 255)  # Укажите нужный цвет
-    wait_for_site_ready_color(SITE_READY_COLOR, 10, (530, 8, 53, 32))
+    SITE_READY_COLOR = (191, 47, 38, 255)  # Укажите нужный цвет
+    wait_for_site_ready_color(SITE_READY_COLOR, 10, (0, 100, 10, 10))
 
     do_login()
     print('Выполнен вход')
