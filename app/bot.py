@@ -234,23 +234,24 @@ def do_login():
     """
     print("[INFO] Выполняется логин...")
     telegram_log("[DEBUG] Enter the button 'Вход'")
-    pyautogui.click(530, 8, clicks=1)
+    pyautogui.click(1190, 12, clicks=1)
     time.sleep(1)
 
     telegram_log("[DEBUG] In the window that appears, click on the 'Phone number' field")
-    pyautogui.click(534, 226, clicks=1)
-    telegram_log("Enter the phone number")
+    pyautogui.click(534, 232, clicks=1)
+    telegram_log("[DEBUG] Enter the phone number")
     pyautogui.write(PHONE_NUMBER, interval=0.1)
     time.sleep(1)
 
-    telegram_log("Click to field 'password'")
-    pyautogui.click(534, 294, clicks=1)
-    telegram_log("Enter password")
+    telegram_log("[DEBUG] Click to field 'password'")
+    pyautogui.click(534, 300, clicks=1)
+    telegram_log("[DEBUG] Enter password")
     pyautogui.write(PASSWORD, interval=0.1)
 
-    telegram_log("Press button enter")
+    telegram_log("[DEBUG] Press button enter")
     pyautogui.press("enter")
     time.sleep(3)
+
 
 
 
