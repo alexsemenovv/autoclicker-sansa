@@ -531,9 +531,9 @@ def find_outcome(outcome, coef_condition, bet_amount):
       7. Если не подходит — скроллим вверх и жмём Retry.
     """
     PREDEFINED_OUTCOME_COORDS = {
-        "1": (761, 242),
-        "X": (399, 573),
-        "2": (555, 572)
+        "1": (450, 150),
+        "X": (500, 150),
+        "2": (600, 150)
     }
     OUTCOME_SEARCH_REGION = (220, 273, 938, 691)
     FINISH_COORDS = (1160, 597)
