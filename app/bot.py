@@ -532,9 +532,9 @@ def find_outcome(outcome, coef_condition, bet_amount):
       7. Если не подходит — скроллим вверх и жмём Retry.
     """
     PREDEFINED_OUTCOME_COORDS = {
-        "1": (450, 150),
-        "X": (500, 150),
-        "2": (600, 150)
+        "1": (405, 549),
+        "X": (521, 546),
+        "2": (648, 547)
     }
     OUTCOME_SEARCH_REGION = (220, 273, 938, 691)
     FINISH_COORDS = (1160, 597)
@@ -707,4 +707,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    time.sleep(3)
+    print(f"Координаты п1: {pyautogui.position()}")
+    time.sleep(3)
+    print(f"Координаты X: {pyautogui.position()}")
+    time.sleep(3)
+    print(f"Координаты п2: {pyautogui.position()}")
