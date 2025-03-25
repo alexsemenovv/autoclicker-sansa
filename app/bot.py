@@ -366,11 +366,11 @@ def optimized_search_for_outcome(outcome, outcome_search_region, max_scroll_iter
 # ======================= Координаты и константы для ставок =======================
 
 # Две группы координат для ввода ставки
-BET_INPUT_CANDIDATES_SET1 = [(1202, 445), (1200, 491), (1200, 660)]  # пример
+BET_INPUT_CANDIDATES_SET1 = [(1225, 430)]  # пример
 BET_INPUT_CANDIDATES_SET2 = [(1201, 657)]  # пример
 
 # Цвет, который мы ожидаем увидеть на месте ввода суммы
-TARGET_COLOR = (218, 218, 218)
+TARGET_COLOR = (59, 59, 59)
 COLOR_TOLERANCE = 4
 
 # Параметры для области скрина коэффициента (финальная проверка)
@@ -423,36 +423,36 @@ def extract_coefficient_from_region(region):
     screenshot = pyautogui.screenshot(region=region)
 
     # Обрезаем правую половину и нижние 2/3
-    if chosen_candidate in BET_INPUT_CANDIDATES_SET1:
-        width, height = screenshot.size
-        left = int(width / 2)
-        upper = int(height * 1 / 3)
-        cropped_screenshot = screenshot.crop((left, upper, width, height))
-    else:
-        cropped_screenshot = screenshot
+    # if chosen_candidate in BET_INPUT_CANDIDATES_SET1:
+    #     width, height = screenshot.size
+    #     left = int(width / 2)
+    #     upper = int(height * 1 / 3)
+    #     cropped_screenshot = screenshot.crop((left, upper, width, height))
+    # else:
+    #     cropped_screenshot = screenshot
     # Отладочный скрин
     debug_coef_path = "debug_coef_screenshot.png"
-    cropped_screenshot.save(debug_coef_path)
+    screenshot.save(debug_coef_path)
     for chat_id in subscribers:
         send_photo(chat_id, debug_coef_path, caption="Скрин коэффициента (обрезанный)")
 
     time.sleep(1)
 
     # Получаем OCR-текст и ищем число
-    full_text, _ = extract_text_google_vision(cropped_screenshot)
-    telegram_log(f"[DEBUG] OCR текст коэффициента: {full_text}")
+    # full_text, _ = extract_text_google_vision(cropped_screenshot)
+    # telegram_log(f"[DEBUG] OCR текст коэффициента: {full_text}")
 
-    matches = re.findall(r"\b\d+(?:\.\d+)?\b", full_text)
-    if matches:
-        coef_str = matches[0].replace(",", ".")
-        try:
-            coefficient = float(coef_str)
-            return coefficient
-        except Exception as e:
-            telegram_log(f"[ERROR] Ошибка преобразования OCR результата в число: {e}")
-            return None
-    else:
-        return None
+    # matches = re.findall(r"\b\d+(?:\.\d+)?\b", full_text)
+    # if matches:
+    #     coef_str = matches[0].replace(",", ".")
+    #     try:
+    #         coefficient = float(coef_str)
+    #         return coefficient
+    #     except Exception as e:
+    #         telegram_log(f"[ERROR] Ошибка преобразования OCR результата в число: {e}")
+    #         return None
+    # else:
+    #     return None
 
 
 def parse_coefficient_from_text(text):
@@ -473,11 +473,7 @@ def parse_coefficient_from_text(text):
 
 def find_bet_input_coords():
     """
-    Ищем координаты для ввода суммы среди двух наборов:
-      - Сначала перебираем BET_INPUT_CANDIDATES_SET1 (до 3 попыток).
-      - Если не находим нужный цвет, скроллим чуть вниз, затем «мотнём» обратно вверх
-        и делаем скриншот цены, после чего пробуем BET_INPUT_CANDIDATES_SET2.
-
+    Ищем координаты для ввода
     Возвращает кортеж (x, y) или None, если ничего не нашли.
     """
 
@@ -503,15 +499,6 @@ def find_bet_input_coords():
     # 1) Сначала пробуем первый набор координат
     found = check_candidates_set(BET_INPUT_CANDIDATES_SET1)
     if found:
-        return found
-    else:
-        telegram_log("Пытаюсь крутить!")
-        # Скроллим чуть вниз
-        pyautogui.click(1181, 573)
-        time.sleep(0.5)
-        pyautogui.scroll(-2)
-        found = (1218, 590)
-        time.sleep(1)
         return found
 
 
@@ -577,8 +564,12 @@ def find_outcome(outcome, coef_condition, bet_amount):
 
     # Ввод суммы
     # 6. Ввод суммы для выбранного кандидата
-    pyautogui.click(chosen_candidate[0], chosen_candidate[1], clicks=2)
-    pyautogui.write(str(bet_amount), interval=0.1)
+    pyautogui.click(chosen_candidate[0], chosen_candidate[1], clicks=1)
+    pyautogui.hotkey("command", "a")
+    pyautogui.press("backspace")
+    pyperclip.copy(str(bet_amount))
+    pyautogui.hotkey("command", "v")
+    pyautogui.click(1250, 528)
     time.sleep(2)
     pyautogui.scroll(300)
 
@@ -588,8 +579,6 @@ def find_outcome(outcome, coef_condition, bet_amount):
         coef_region_y = chosen_candidate[1] - COEFFICIENT_SCREENSHOT_SHIFT_Y
         coef_region_width = 2 * COEFFICIENT_SCREENSHOT_PADDING_X
         coef_region_height = COEFFICIENT_SCREENSHOT_PADDING_BOTTOM
-    else:  # Предполагается, что кандидат из второго сета
-        coef_region_x, coef_region_y, coef_region_width, coef_region_height = 1212, 594, 50, 20
 
     screenshot_coef = pyautogui.screenshot(region=(coef_region_x, coef_region_y, coef_region_width, coef_region_height))
     debug_coef_path = "debug_coef_screenshot.png"
@@ -707,10 +696,4 @@ def main():
 
 
 if __name__ == "__main__":
-    # main()
-    time.sleep(3)
-    print(f"Координаты п1: {pyautogui.position()}")
-    time.sleep(3)
-    print(f"Координаты X: {pyautogui.position()}")
-    time.sleep(3)
-    print(f"Координаты п2: {pyautogui.position()}")
+    main()
