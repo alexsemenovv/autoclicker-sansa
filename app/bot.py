@@ -1,6 +1,7 @@
 import time
 import threading
 
+import pyperclip
 import requests
 import pyautogui
 import os
@@ -177,7 +178,8 @@ def open_browser_and_navigate():
     pyautogui.hotkey('ctrl', 'l')
     time.sleep(1)
     pyautogui.click(505, 66)  # кликаем на адресную строку
-    pyautogui.write("https://www.olimp.bet/", interval=0.1)
+    time.sleep(1)
+    pyautogui.write("https://www.olimp.bet/", interval=0.2)
     pyautogui.press("enter")
 
 
@@ -253,13 +255,16 @@ def find_match(match_name):
     """
     Переходит в лайв и вводит название матча match_name в поиске.
     """
-    match_input_coords = (53, 74)
-    match_click_coords = (500, 242)
-
+    logging.debug("Заходим в лайв и ищем матч")
+    time.sleep(3)
+    match_input_coords = (184, 189)
+    match_click_coords = (606, 336)
     pyautogui.click(match_input_coords[0], match_input_coords[1])
-    time.sleep(0.5)
-    pyautogui.write(match_name, interval=0.05)
-    time.sleep(1)
+    time.sleep(2)
+
+    pyperclip.copy(match_name)  # Копируем текст в буфер обмена, так как write не работает для русских символов
+    pyautogui.hotkey("command", "v")  # Вставляем текст
+    time.sleep(3)
 
     pyautogui.click(match_click_coords[0], match_click_coords[1])
     time.sleep(2)
