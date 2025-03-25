@@ -173,11 +173,12 @@ def open_browser_and_navigate():
     """
     Открываем olimp.bet (или другой нужный сайт) через адресную строку.
     """
+    logging.debug("Открываем olimp.bet")
     pyautogui.hotkey('ctrl', 'l')
     time.sleep(1)
+    pyautogui.click(505, 66)  # кликаем на адресную строку
     pyautogui.write("https://www.olimp.bet/", interval=0.1)
     pyautogui.press("enter")
-
 
 
 def wait_for_site_ready_color(target_color, color_tolerance=10, check_region=(0, 100, 5, 5)):
@@ -234,26 +235,18 @@ def do_login():
     Логинимся
     """
     print("[INFO] Выполняется логин...")
-    telegram_log("[DEBUG] Enter the button 'Вход'")
-    pyautogui.click(1190, 12, clicks=1)
+    pyautogui.click(1238, 123, clicks=1)
     time.sleep(1)
 
-    telegram_log("[DEBUG] In the window that appears, click on the 'Phone number' field")
-    pyautogui.click(534, 232, clicks=1)
-    telegram_log("[DEBUG] Enter the phone number")
+    pyautogui.click(708, 449, clicks=1)
     pyautogui.write(PHONE_NUMBER, interval=0.1)
     time.sleep(1)
 
-    telegram_log("[DEBUG] Click to field 'password'")
-    pyautogui.click(534, 300, clicks=1)
-    telegram_log("[DEBUG] Enter password")
+    pyautogui.click(621, 523, clicks=1)
     pyautogui.write(PASSWORD, interval=0.1)
 
-    telegram_log("[DEBUG] Press button enter")
-    pyautogui.press("enter")
+    pyautogui.click(617, 611, clicks=1)
     time.sleep(3)
-
-
 
 
 def find_match(match_name):
@@ -319,7 +312,7 @@ def optimized_search_for_outcome(outcome, outcome_search_region, max_scroll_iter
 
         # Распознаём текст на текущем скриншоте
         full_text, results = extract_text_google_vision(current_screenshot)
-        telegram_log(f"[DEBUG] Итерация {iteration+1}\nПолный текст:\n{full_text.strip()}")
+        telegram_log(f"[DEBUG] Итерация {iteration + 1}\nПолный текст:\n{full_text.strip()}")
 
         n = len(results)
         # Перебираем OCR-блоки для поиска последовательного совпадения с ожидаемым исходом
@@ -353,7 +346,8 @@ def optimized_search_for_outcome(outcome, outcome_search_region, max_scroll_iter
                             f"[DEBUG] Найден исход путём объединения блоков {i}-{j}: '{current_combined}'. Координаты: {coords}")
                         return coords, matched_text
                 else:
-                    telegram_log(f"[DEBUG] Объединение '{current_combined + ' ' + next_block}' не соответствует '{expected}'. Прерываем объединение.")
+                    telegram_log(
+                        f"[DEBUG] Объединение '{current_combined + ' ' + next_block}' не соответствует '{expected}'. Прерываем объединение.")
                     break
 
         previous_screenshot = current_screenshot
@@ -699,7 +693,7 @@ def main():
     wait_for_site_ready_color(SITE_READY_COLOR, 10, (0, 100, 10, 10))
 
     do_login()
-    print('Выполнен вход')
+    telegram_log('Выполнен вход')
     time.sleep(5)
 
     # Просто ждём, пока в другом потоке poll_updates обрабатывает сообщения
